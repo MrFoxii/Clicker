@@ -32,7 +32,7 @@ public class GameManager : MonoBehaviour
     {
         get
         {
-            return 10 * System.Math.Pow(2, stage - 1) * isBoss;
+            return 10 * Math.Pow(2, stage - 1) * isBoss;
         }
     }
   
@@ -118,9 +118,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    
+    // BackGround
+    public Image bgBoss;
 
+    //change sprite enemy
+    private int rand;
+    public Sprite[] Sprite_Pic;
 
+    public Image Enemy;
+    public Image EnemyBoss;
 
 
 
@@ -131,6 +137,8 @@ public class GameManager : MonoBehaviour
         IsBoss();
         health = healthCap;
         timerCap = 30;
+
+
     }
 
     // Start is called before the first frame update
@@ -156,12 +164,12 @@ public class GameManager : MonoBehaviour
         else health -= dps * Time.deltaTime;
        
 
-        moneyText.text = "$" + money.ToString("F2");
+        moneyText.text = "$" + WordNotation(money, "F2");
         StageText.text = "Stage - " + stage;
         killsText.text = kills + "/" + killsMax + "Kills";
-        healthText.text = health + "/" + healthCap + "HP";
-        DPCText.text =  dpc + "dmg/c";
-        DPSText.text =  dps + "dmg/s";
+        healthText.text = WordNotation(health, "F0") + "/" + WordNotation(healthCap, "F2") + "HP";
+        DPCText.text = WordNotation(dpc, "F2")  + "dmg/c";
+        DPSText.text = WordNotation(dps, "F2")  + "dmg/s";
 
         healthBar.fillAmount = (float)(health / healthCap);
 
@@ -196,13 +204,21 @@ public class GameManager : MonoBehaviour
 
     }
 
+    public void ChangeSprite()
+    {
+        rand = UnityEngine.Random.Range(0, Sprite_Pic.Length);
+        Enemy.GetComponent<Image>().sprite = Sprite_Pic[rand];
+
+    }
+
+
     public void Upgrades()
     {
-        cCostText.text = "Cost : $" + cCost.ToString("F2");
+        cCostText.text = "Cost : $" + WordNotation(cCost, "F2");
         cLevelText.text = "Level : " + cLevel;
         cPowerText.text = "+2/c";
 
-        pCostText.text = "Cost : $" + pCost.ToString("F2");
+        pCostText.text = "Cost : $" + WordNotation(pCost, "F2");
         pLevelText.text = "Level : " + pLevel;
         pPowerText.text = "+5/s";
         dps = pPower;
@@ -221,21 +237,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     public void IsBoss()
     {
         if (stage % 5 == 0)
         {
+            
             isBoss = 10;
             StageText.text = "BOSS ! (Stage - " + stage + " )";
             timer -= Time.deltaTime;
-            if(timer <= 0)
+            ChangeSprite();
+            if (timer <= 0)
             {
                 Back();
             }
-            timerText.text = timer + "/" + timerCap;
+            timerText.text = timer.ToString("F2") + "/" + timerCap;
             timerBar.gameObject.SetActive(true);
             timerBar.fillAmount = timer / timerCap;
             killsMax = 1;
+            bgBoss.gameObject.SetActive(true);
+            Enemy.gameObject.SetActive(false);
+            EnemyBoss.gameObject.SetActive(true);
+            
 
 
         }
@@ -247,6 +270,10 @@ public class GameManager : MonoBehaviour
             timerBar.gameObject.SetActive(false);
             timer = 30;
             killsMax = 10;
+            bgBoss.gameObject.SetActive(false);
+            Enemy.gameObject.SetActive(true);
+            EnemyBoss.gameObject.SetActive(false);
+
 
         }
     }
@@ -264,6 +291,7 @@ public class GameManager : MonoBehaviour
     {
         money += Math.Ceiling(healthCap / 14);
         coinExplosion.Play("CoinExplosion", 0, 0);
+        ChangeSprite();
         if (stage == stageMax)
         {
             kills += 1;
@@ -272,6 +300,7 @@ public class GameManager : MonoBehaviour
                 kills = 0;
                 stage += 1;
                 stageMax += 1;
+                
             }
         }
         IsBoss();
@@ -325,6 +354,29 @@ public class GameManager : MonoBehaviour
         level++;
         
     }
+
+    public string WordNotation(double number, string digits)
+    {
+        double digitsTemp = Math.Floor(Math.Log10(number));
+        IDictionary<double, string> prefixes = new Dictionary<double, string>()
+        {
+            {3, "K" },          
+            {6, "M" },           
+            {9, "B" },          
+            {12, "T" },           
+            {15, "Qa" },           
+            {18, "Qi" },           
+            {21, "Se" },           
+            {24, "Sep" },
+            
+
+        };
+        double digitsEvery3 = 3 * Math.Floor(digitsTemp / 3);
+        if (number >= 1000)
+            return (number / Math.Pow(10, digitsEvery3)).ToString(digits) + prefixes[digitsEvery3];
+        return number.ToString(digits);
+    }
+
 
     public void Save()
     {

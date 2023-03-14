@@ -48,13 +48,13 @@ public class GameManager : MonoBehaviour
 
 
 
-    public Text moneyText;
-    public Text DPCText;
-    public Text DPSText;
-    public Text StageText;
-    public Text killsText;
-    public Text healthText;
-    public Text timerText;
+    public TextMeshProUGUI moneyText;
+    public TextMeshProUGUI DPCText;
+    public TextMeshProUGUI DPSText;
+    public TextMeshProUGUI StageText;
+    public TextMeshProUGUI killsText;
+    public TextMeshProUGUI healthText;
+    public TextMeshProUGUI timerText;
 
 
     public GameObject back;
@@ -73,16 +73,16 @@ public class GameManager : MonoBehaviour
     public DateTime oldTime;
     public int OfflineProgressCheck;
     public float idleTime;
-    public Text offlineTimeText;
+    public TextMeshProUGUI offlineTimeText;
     public float saveTime;
     public GameObject offlineBox;
     public int offlineLoadCount;
 
     //upgrades
 
-    public Text pCostText;
-    public Text pLevelText;
-    public Text pPowerText;
+    public TextMeshProUGUI pCostText;
+    public TextMeshProUGUI pLevelText;
+    public TextMeshProUGUI pPowerText;
     public double pCost
     {
         get
@@ -99,9 +99,9 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public Text cCostText;
-    public Text cLevelText;
-    public Text cPowerText;
+    public TextMeshProUGUI cCostText;
+    public TextMeshProUGUI cLevelText;
+    public TextMeshProUGUI cPowerText;
     public double cCost
     {
         get
@@ -128,7 +128,9 @@ public class GameManager : MonoBehaviour
     public Image Enemy;
     public Image EnemyBoss;
 
-
+    //effect
+    public GameObject coinsEffect;
+    public GameObject spawn;
 
     public void Start()
     {
@@ -167,7 +169,7 @@ public class GameManager : MonoBehaviour
         moneyText.text = "$" + WordNotation(money, "F2");
         StageText.text = "Stage - " + stage;
         killsText.text = kills + "/" + killsMax + "Kills";
-        healthText.text = WordNotation(health, "F0") + "/" + WordNotation(healthCap, "F2") + "HP";
+        healthText.text = WordNotation(health, "F0") + "/" + WordNotation(healthCap, "F2") + " HP";
         DPCText.text = WordNotation(dpc, "F2")  + "dmg/c";
         DPSText.text = WordNotation(dps, "F2")  + "dmg/s";
 
@@ -290,7 +292,8 @@ public class GameManager : MonoBehaviour
     public void Kill()
     {
         money += Math.Ceiling(healthCap / 14);
-        coinExplosion.Play("CoinExplosion", 0, 0);
+       // coinExplosion.Play("CoinExplosion", 0, 0);
+        Instantiate(coinsEffect, spawn.transform.position, Quaternion.identity);
         ChangeSprite();
         if (stage == stageMax)
         {
@@ -430,7 +433,7 @@ public class GameManager : MonoBehaviour
             money += moneyToEarn;
 
             TimeSpan timer = TimeSpan.FromSeconds(idleTime);
-            offlineTimeText.text = "You were gone for " + timer.ToString(@"hh\:mm\:ss") + "\n\nYou earned : $" + moneyToEarn.ToString("F2");
+            offlineTimeText.text = "You were gone for " + timer.ToString(@"hh\:mm\:ss") + "\nYou earned : $" + moneyToEarn.ToString("F2");
         }
     }
 
